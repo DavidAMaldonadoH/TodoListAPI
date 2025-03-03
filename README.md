@@ -28,4 +28,4 @@ You can check all the endpoints and schemas used in each endpoint in the OpenAPI
 documentation which is in the **/swagger** endpoint.
 
 ## Project URL
-(Expense Tracker API | Roadmap)[https://roadmap.sh/projects/todo-list-api]
+(TODO List API | Roadmap)[https://roadmap.sh/projects/todo-list-api]
