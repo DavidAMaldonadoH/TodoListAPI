@@ -13,8 +13,8 @@ public class TodosController(TodoListDbContext dbContext) : BaseController
     /// <summary>
     /// Get all TODOs
     /// </summary>
-    /// <param name="request">Filters to the array of todos</param>
-    /// <returns>An array of the filtered todos</returns>
+    /// <param name="request">Filters to the array of TODOs</param>
+    /// <returns>An array of the filtered TODOs</returns>
     [Authorize]
     [HttpGet]
     [ProducesResponseType(typeof(GetAllTodosResponse), StatusCodes.Status200OK)]
@@ -160,6 +160,47 @@ public class TodosController(TodoListDbContext dbContext) : BaseController
     }
 
     /// <summary>
+    /// Mark a TODO as completed or not completed
+    /// </summary>
+    /// <param name="id">The ID of the todo to mark as completed or not completed</param>
+    /// <param name="request">The is completed state of the TODO</param>
+    /// <returns>The updated TODO</returns>
+    [Authorize]
+    [HttpPatch("{id:long}")]
+    [ProducesResponseType(typeof(GetTodoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> PatchTodo([FromRoute] long id, [FromBody] PatchTodoRequest request)
+    {
+        var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "-1");
+        var existingUser = await _dbContext.Users.FindAsync(userId);
+        if (existingUser == null)
+        {
+            return BadRequest();
+        }
+
+        var existingTodo = await _dbContext.Todos.SingleOrDefaultAsync(t => t.Id == id);
+        if (existingTodo == null)
+        {
+            return NotFound();
+        }
+
+        existingTodo.IsCompleted = request.IsCompleted;
+        try
+        {
+            _dbContext.Entry(existingTodo).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(TodoToGetTodoResponse(existingTodo));
+        }
+        catch
+        {
+            return StatusCode(500, "There was an error while updating the TODO");
+        }
+    }
+
+    /// <summary>
     /// Delete a TODO by its ID
     /// </summary>
     /// <param name="id">The ID of the TODO to delete</param>
@@ -204,7 +245,8 @@ public class TodosController(TodoListDbContext dbContext) : BaseController
         {
             Id = todo.Id,
             Title = todo.Title,
-            Description = todo.Description
+            Description = todo.Description,
+            IsCompleted = todo.IsCompleted
         };
     }
 }

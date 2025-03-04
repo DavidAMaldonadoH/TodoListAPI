@@ -30,6 +30,7 @@ public class TodoListDbContext(DbContextOptions<TodoListDbContext> options) : Db
             todo.HasKey(t => t.Id);
             todo.Property(t => t.Title).HasColumnType("varchar(128)");
             todo.Property(t => t.Description).HasColumnType("varchar(255)");
+            todo.Property(t => t.IsCompleted).HasColumnType("tinyint(1)").HasDefaultValue(0);
             todo.Property(t => t.UserId).HasColumnType("bigint");
         });
 

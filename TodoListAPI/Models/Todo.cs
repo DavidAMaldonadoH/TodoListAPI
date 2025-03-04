@@ -7,6 +7,7 @@ public class Todo
     public long Id { set; get; }
     public required string Title { get; set; }
     public required string Description { get; set; }
+    public bool IsCompleted { get; set; }
     public required long UserId { get; set; }
     public User User = null!;
 }
@@ -41,11 +42,17 @@ public class UpdateTodoRequestValidator : AbstractValidator<UpdateTodoRequest>
     }
 }
 
+public class PatchTodoRequest
+{
+    public bool IsCompleted { get; set; }
+}
+
 public class GetTodoResponse
 {
     public long Id { set; get; }
     public required string Title { get; set; }
     public required string Description { get; set; }
+    public required bool IsCompleted { get; set; }
 }
 
 public class GetAllTodosRequest
