@@ -27,5 +27,13 @@ dotnet run # To execute the solution
 You can check all the endpoints and schemas used in each endpoint in the OpenAPI generated
 documentation which is in the **/swagger** endpoint.
 
+## Extras
+### Unit Test
+To successfully execute the unit tests, Docker must be installed, as they run on TestContainers. If you already have Docker installed, feel free to run the following commands:
+```bash
+cd ./TodoListAPITests
+dotnet test
+```
+
 ## Project URL
 (TODO List API | Roadmap)[https://roadmap.sh/projects/todo-list-api]

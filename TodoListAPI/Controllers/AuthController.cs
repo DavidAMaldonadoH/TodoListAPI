@@ -52,21 +52,29 @@ public class AuthController(TodoListDbContext dbContext, IConfiguration configur
     /// <returns>A link to the user that was created</returns>
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
     {
+        var userEmail = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == request.Email);
+        if (userEmail != null)
+        {
+            return BadRequest("Email already in use");
+        }
+
+
         var newUser = new User
         {
-            Name = request.Name,
-            Email = request.Email,
-            Password = PasswordHelper.HashPassword(request.Password)
+            Name = request.Name!,
+            Email = request.Email!,
+            Password = PasswordHelper.HashPassword(request.Password!)
         };
 
         try
         {
-            _dbContext.Add(newUser);
+            await _dbContext.AddAsync(newUser);
             await _dbContext.SaveChangesAsync();
-            return Ok(newUser);
+            return StatusCode(201, newUser);
         }
         catch
         {
